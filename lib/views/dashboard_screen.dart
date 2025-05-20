@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'add_provider_screen.dart';
 import 'add_service_screen.dart';
 import 'client_orders_screen.dart';
 import 'support_screen.dart';
@@ -16,7 +17,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -55,7 +56,8 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
           controller: _tabController,
           tabs: [
             Tab(text: 'Client Orders'),
-            Tab(text: 'Add Service'),
+            Tab(text: 'Provider'),
+            Tab(text: 'Service'),
             Tab(text: 'Support'),
           ],
         ),
@@ -64,6 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
         controller: _tabController,
         children: [
           ClientOrdersTab(),
+          AddProviderScreen(),
           AddServiceTab(),
           SupportTab(),
         ],

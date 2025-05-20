@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
+import 'booking_calender_screen.dart';
+
 class BookingScreen extends StatefulWidget {
   @override
   _BookingScreenState createState() => _BookingScreenState();
@@ -236,7 +238,12 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                   SizedBox(height: 8.h),
                   InkWell(
-                    onTap: _presentDatePicker,
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BookingCalendarDemoApp()),
+                      );
+                    },
                     child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),

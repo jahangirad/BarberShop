@@ -1,178 +1,193 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../controllers/provider_service_controller.dart';
 
-class AddServiceTab extends StatefulWidget {
-  @override
-  _AddServiceTabState createState() => _AddServiceTabState();
-}
+class AddServiceTab extends StatelessWidget {
+  final controller = Get.put(ProviderServiceController());
 
-class _AddServiceTabState extends State<AddServiceTab> {
   final _formKey = GlobalKey<FormState>();
-  String? _serviceName;
-  String? _description;
-  double? _price;
-  int? _durationMinutes;
-  String? _selectedCategory;
+  final nameController = TextEditingController();
+  final subtitleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final ratingController = TextEditingController();
+  final priceController = TextEditingController();
+  final comparePriceController = TextEditingController();
+  final durationController = TextEditingController();
 
-  final List<String> _categories = ['Hair Salon', 'Barbershop', 'Makeup', 'Nail Salon', 'Spa', 'Tattoo'];
+  final selectedProviderUid = ''.obs;
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      // Simulating data processing
-      print('Service Name: $_serviceName');
-      print('Description: $_description');
-      print('Price: $_price');
-      print('Duration: $_durationMinutes minutes');
-      print('Category: $_selectedCategory');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Service "${_serviceName}" added successfully! (Simulated)'),
-          backgroundColor: Colors.green.shade600,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-          margin: EdgeInsets.all(10.w),
-        ),
-      );
-      _formKey.currentState!.reset();
-      setState(() {
-        _selectedCategory = null;
-      });
-      // Hide keyboard
-      FocusScope.of(context).unfocus();
-    }
-  }
+  final Color _primaryColor = const Color(0xFFFDB813); // Glamii Red
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            // Optional: Add an image picker placeholder like in screenshots
-            // GestureDetector(
-            //   onTap: () { /* Implement image picker */ },
-            //   child: Container(
-            //     height: 150.h,
-            //     decoration: BoxDecoration(
-            //       color: Theme.of(context).cardTheme.color,
-            //       borderRadius: BorderRadius.circular(10.r),
-            //       // border: Border.all(color: Colors.grey.shade700)
-            //     ),
-            //     child: Column(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Icon(Icons.add_a_photo_outlined, size: 40.sp, color: Colors.white70),
-            //         SizedBox(height: 8.h),
-            //         Text('Add Service Image', style: TextStyle(color: Colors.white70, fontSize: 14.sp)),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: 20.h),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.w),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Image Picker
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Column(
+                  children: [
+                    Obx(() => controller.selectedImage.value != null
+                        ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Image.file(
+                        controller.selectedImage.value!,
+                        height: 180.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : SizedBox(
+                      height: 180.h,
+                      child: Center(
+                        child: Text(
+                          'No image selected',
+                          style: TextStyle(
+                              color: Colors.grey, fontSize: 14.sp),
+                        ),
+                      ),
+                    )),
+                    SizedBox(height: 10.h),
+                    ElevatedButton.icon(
+                      onPressed: controller.pickImage,
+                      icon: const Icon(Icons.image),
+                      label: const Text("Pick Service Image"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _primaryColor,
+                        foregroundColor: Colors.black,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12.h, horizontal: 16.w),
+                        textStyle: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Poppins'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        minimumSize: Size(double.infinity, 45.h),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-            _buildTextFormField(
-              label: 'Service Name',
-              icon: Icons.design_services_outlined, // Changed icon
-              validator: (value) => value == null || value.isEmpty ? 'Please enter service name' : null,
-              onSaved: (value) => _serviceName = value,
-            ),
-            SizedBox(height: 16.h),
-            _buildTextFormField(
-              label: 'Description',
-              icon: Icons.notes_outlined, // Changed icon
-              maxLines: 3,
-              validator: (value) => value == null || value.isEmpty ? 'Please enter a description' : null,
-              onSaved: (value) => _description = value,
-            ),
-            SizedBox(height: 16.h),
-            _buildTextFormField(
-              label: 'Price (\$)',
-              icon: Icons.attach_money_rounded,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Please enter a price';
-                if (double.tryParse(value) == null) return 'Please enter a valid number';
-                if (double.parse(value) <= 0) return 'Price must be positive';
-                return null;
-              },
-              onSaved: (value) => _price = double.tryParse(value!),
-            ),
-            SizedBox(height: 16.h),
-            _buildTextFormField(
-              label: 'Duration (minutes)',
-              icon: Icons.timer_outlined,
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) return 'Please enter duration';
-                if (int.tryParse(value) == null) return 'Please enter a valid number';
-                if (int.parse(value) <= 0) return 'Duration must be positive';
-                return null;
-              },
-              onSaved: (value) => _durationMinutes = int.tryParse(value!),
-            ),
-            SizedBox(height: 16.h),
-            _buildDropdownFormField(),
-            SizedBox(height: 24.h),
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: Text('Add Service'),
-            ),
-          ],
+              SizedBox(height: 20.h),
+              _buildTextField(nameController, "Service Name"),
+              _buildTextField(subtitleController, "Subtitle"),
+              _buildTextField(ratingController, "Rating", isNumber: true),
+              _buildTextField(priceController, "Price", isNumber: true),
+              _buildTextField(comparePriceController, "Compare Price",
+                  isNumber: true),
+              _buildTextField(durationController, "Duration (minutes)",
+                  isNumber: true),
+
+              const SizedBox(height: 16),
+
+              // Provider Dropdown
+              Obx(() => DropdownButtonFormField<String>(
+                value: selectedProviderUid.value.isEmpty
+                    ? null
+                    : selectedProviderUid.value,
+                hint: const Text("Select Provider"),
+                items: controller.provider
+                    .map((prov) => DropdownMenuItem<String>(
+                  value: prov['uid'],
+                  child: Text(prov['name']),
+                ))
+                    .toList(),
+                onChanged: (val) => selectedProviderUid.value = val!,
+                validator: (val) =>
+                val == null ? 'Please select provider' : null,
+                decoration:
+                const InputDecoration(border: OutlineInputBorder()),
+              )),
+
+              SizedBox(height: 24.h),
+
+              // Submit Button
+              Obx(() => ElevatedButton(
+                onPressed: controller.isLoading.value
+                    ? null
+                    : () {
+                  if (_formKey.currentState!.validate() &&
+                      controller.selectedImage.value != null) {
+                    controller.addService(
+                      name: nameController.text,
+                      subtitle: subtitleController.text,
+                      rating: ratingController.text,
+                      price: priceController.text,
+                      comparePrice:
+                      comparePriceController.text,
+                      duration: durationController.text,
+                      providerUid: selectedProviderUid.value,
+                      image: controller.selectedImage.value!,
+                    );
+                  } else {
+                    Get.snackbar("Missing Info",
+                        "Please fill all fields and select an image");
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _primaryColor,
+                  foregroundColor: Colors.black,
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  textStyle: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r)),
+                  minimumSize: Size(double.infinity, 50.h),
+                ),
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.black,
+                    strokeWidth: 2.5,
+                  ),
+                )
+                    : Text(
+                  "Submit Service",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins'),
+                ),
+              )),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextFormField({
-    required String label,
-    required IconData icon,
-    int maxLines = 1,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-    void Function(String?)? onSaved,
-  }) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, size: 20.sp),
+  Widget _buildTextField(TextEditingController controller, String label,
+      {bool isNumber = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+            labelText: label, border: const OutlineInputBorder()),
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        validator: (val) =>
+        val == null || val.isEmpty ? 'Required field' : null,
       ),
-      style: TextStyle(color: Colors.white, fontSize: 16.sp),
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
-      onSaved: onSaved,
-      cursorColor: Theme.of(context).hintColor,
-    );
-  }
-
-  Widget _buildDropdownFormField() {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(
-        labelText: 'Category',
-        prefixIcon: Icon(Icons.category_outlined, size: 20.sp),
-      ),
-      dropdownColor: Color(0xFF3A3A3A), // Slightly different dark for dropdown menu
-      style: TextStyle(color: Colors.white, fontSize: 16.sp),
-      icon: Icon(Icons.arrow_drop_down_rounded, color: Colors.white.withOpacity(0.7)),
-      value: _selectedCategory,
-      items: _categories.map((String category) {
-        return DropdownMenuItem<String>(
-          value: category,
-          child: Text(category),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          _selectedCategory = value;
-        });
-      },
-      validator: (value) => value == null ? 'Please select a category' : null,
-      onSaved: (value) => _selectedCategory = value,
     );
   }
 }
