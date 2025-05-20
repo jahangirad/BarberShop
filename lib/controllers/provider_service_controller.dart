@@ -122,6 +122,17 @@ class ProviderServiceController extends GetxController {
     }
   }
 
+  Future<void> fetchService() async {
+    try {
+      isLoading.value = true;
+      final response = await supabase.from('service').select();
+      service.assignAll(response);
+    } catch (e) {
+      throw Exception(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   @override
   void onInit() {
