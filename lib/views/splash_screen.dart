@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../controllers/auth_fetch_controller.dart';
+import '../controllers/provider_service_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,10 +17,17 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+  final ProviderServiceController providerServiceController = Get.put(ProviderServiceController());
+  final UserService userService = Get.put(UserService());
+
   @override
   void initState() {
     super.initState();
     _checkSessionAndNavigate();
+    providerServiceController.fetchService();
+    providerServiceController.fetchProvider();
+    userService.fetchCurrentUser();
   }
 
   Future<void> _checkSessionAndNavigate() async {

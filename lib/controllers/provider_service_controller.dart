@@ -137,6 +137,7 @@ class ProviderServiceController extends GetxController {
   @override
   void onInit() {
     fetchProvider();
+    fetchService();
     super.onInit();
   }
 }

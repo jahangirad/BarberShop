@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Widget buildOfferCard(String img, String rating, String title, String subtitle, String price, String commition) {
+
   return Container(
     width: double.infinity,
     margin: EdgeInsets.only(bottom: 16.0.h),
@@ -22,23 +23,20 @@ Widget buildOfferCard(String img, String rating, String title, String subtitle, 
                   child: Image.network(
                     img,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[700],
-                      child: Center(
-                        child: Icon(Icons.broken_image, color: Colors.white30, size: 50.r),
-                      ),
-                    ),
-                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                               : null,
-                          color: Colors.amber,
                         ),
                       );
                     },
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.grey,
+                      child: Icon(Icons.broken_image, size: 50, color: Colors.white),
+                    ),
                   ),
                 ),
                 // Rating badge

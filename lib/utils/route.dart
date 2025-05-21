@@ -19,7 +19,6 @@ class AppRoutes {
   static const account = '/account';
   static const dashboard = '/dashboard';
   static const splash = '/splash';
-  static const booking = '/booking';
 
   static final routes = {
     home: (context) => HomeScreen(),
@@ -31,6 +30,5 @@ class AppRoutes {
     account: (context) => AccountScreen(),
     dashboard: (context) => DashboardScreen(),
     splash: (context) => SplashScreen(),
-    booking: (context) => BookingScreen(),
   };
 }
