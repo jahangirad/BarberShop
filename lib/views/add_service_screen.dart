@@ -103,7 +103,7 @@ class AddServiceTab extends StatelessWidget {
                 hint: const Text("Select Provider"),
                 items: controller.provider
                     .map((prov) => DropdownMenuItem<String>(
-                  value: prov['uid'],
+                  value: prov['providername'],
                   child: Text(prov['name']),
                 ))
                     .toList(),
@@ -128,8 +128,7 @@ class AddServiceTab extends StatelessWidget {
                       subtitle: subtitleController.text,
                       rating: ratingController.text,
                       price: priceController.text,
-                      comparePrice:
-                      comparePriceController.text,
+                      comparePrice: comparePriceController.text,
                       duration: durationController.text,
                       providerUid: selectedProviderUid.value,
                       image: controller.selectedImage.value!,

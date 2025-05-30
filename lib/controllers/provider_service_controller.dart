@@ -102,7 +102,7 @@ class ProviderServiceController extends GetxController {
         'price': price,
         'com_price': comparePrice,
         'duration': duration,
-        'uid': providerUid,
+        'providername': providerUid,
         'img': imageUrl,
       });
 

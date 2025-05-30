@@ -5,6 +5,7 @@ import '../views/dashboard_screen.dart';
 import '../views/forget_screen.dart';
 import '../views/home_screen.dart';
 import '../views/login_screen.dart';
+import '../views/order_complete_screen.dart';
 import '../views/resetpassword_screen.dart';
 import '../views/signup_screen.dart';
 import '../views/splash_screen.dart';

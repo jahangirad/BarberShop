@@ -5,8 +5,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/auth_fetch_controller.dart';
+import '../controllers/bookingdt_fetch_controller.dart';
+import '../controllers/order_controller.dart';
 import '../controllers/payment_controller.dart';
+import '../controllers/provider_service_controller.dart';
+import '../utils/route.dart';
 import 'booking_calender_screen.dart';
+import 'order_complete_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   final dynamic servicedetails;
@@ -20,6 +25,9 @@ class _BookingScreenState extends State<BookingScreen> {
 
   final UserService userService = Get.put(UserService());
   final PaymentController paymentController = Get.put(PaymentController());
+  final ProviderServiceController providerServiceController = Get.put(ProviderServiceController());
+  final OrderController orderController = Get.put(OrderController());
+  final BookingDateTime bookingDateTime = Get.put(BookingDateTime());
 
   @override
   Widget build(BuildContext context) {
@@ -205,10 +213,19 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                   SizedBox(height: 8.h),
                   InkWell(
-                    onTap: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => BookingCalendarDemoApp(servicedetails: widget.servicedetails,)),
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true, // Full screen height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                        ),
+                        builder: (context) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                          ),
+                          child: BookingCalendarDemoApp(servicedetails: widget.servicedetails),
+                        ),
                       );
                     },
                     child: Container(
@@ -243,8 +260,39 @@ class _BookingScreenState extends State<BookingScreen> {
             child: Obx(() => ElevatedButton(
               onPressed: paymentController.isProcessing.value
                   ? null
-                  : () {
-                paymentController.makePayment();
+                  : () async {
+                await bookingDateTime.getBookingData(); // wait for data load
+
+                if (bookingDateTime.bookingSlots.isNotEmpty) {
+                  bool success = await paymentController.makePayment();
+                  if (success) {
+                    orderController.addOrders(
+                      widget.servicedetails['ser_name'].toString(),
+                      widget.servicedetails['providername'].toString(),
+                      userService.userData['name'].toString(),
+                      widget.servicedetails['price'].toString(),
+                      paymentController.paymentIntent!['amount_received'].toString(),
+                      paymentController.paymentIntent!['id'].toString(),
+                      widget.servicedetails['duration'].toString(),
+                        bookingDateTime.bookingSlots.length == 1
+                            ? bookingDateTime.bookingSlots[0]['start'].toString()
+                            : bookingDateTime.bookingSlots.last['start'].toString(),
+
+                        bookingDateTime.bookingSlots.length == 1
+                            ? bookingDateTime.bookingSlots[0]['end'].toString()
+                            : bookingDateTime.bookingSlots.last['end'].toString()
+
+                    );
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> OrderCompletePage(
+                      serviceName: widget.servicedetails['ser_name'].toString(),
+                      providerName: widget.servicedetails['providername'].toString(),
+                      price: widget.servicedetails['price'].toString(),
+                      duration: widget.servicedetails['duration'].toString(),
+                    )));
+                  }
+                } else {
+                  Get.snackbar("Error", "No booking slots found.");
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: _primaryColor,

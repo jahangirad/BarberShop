@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.barbershopmy.barber_shop"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

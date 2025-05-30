@@ -8,7 +8,7 @@ class OrderController extends GetxController{
   final RxBool isLoading = false.obs;
   final supabase = Supabase.instance.client;
 
-  Future<void> fetchProvider() async {
+  Future<void> fetchOrders() async {
     try {
       isLoading.value = true;
       final response = await supabase.from('orders').select();
@@ -20,24 +20,30 @@ class OrderController extends GetxController{
     }
   }
 
-  Future<void> addProvider(
-      TextEditingController name,
-      TextEditingController phone,
+  Future<void> addOrders(
+      String serviceName,
+      String providerName,
+      String userName,
+      String amount,
+      String payAmount,
+      String trxId,
+      String duration,
+      String startDate,
+      String endDate,
       ) async {
     try {
       isLoading.value = true;
 
-      final response = await supabase.from('orders').insert({
-        'service': name.text,
-        'provider_name': phone.text,
-        'username': phone.text,
-        'amount': phone.text,
-        'pay_amount': phone.text,
-        'total_amount': phone.text,
-        'trx_id': phone.text,
-        'duration': phone.text,
-        'start_date': phone.text,
-        'end_date': phone.text,
+      await supabase.from('orders').insert({
+        'service': serviceName,
+        'provider_name': providerName,
+        'username': userName,
+        'amount': amount,
+        'pay_amount': payAmount,
+        'trx_id': trxId,
+        'duration': duration,
+        'start_date': startDate,
+        'end_date': endDate,
       });
 
       // ✅ সফলভাবে ইনসার্ট হলে টোস্ট দেখাও
