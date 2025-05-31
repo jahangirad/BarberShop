@@ -1,15 +1,16 @@
-import 'package:barber_shop/utils/route.dart';
 import 'package:barber_shop/widgets/categorylist_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_fetch_controller.dart';
+import '../controllers/category_controller.dart';
 import '../controllers/provider_service_controller.dart';
 import '../widgets/appbar_widget.dart';
 import '../widgets/offercard_widget.dart';
 import '../widgets/searchbar_widget.dart';
 import '../widgets/sectionheader_widget.dart';
 import 'booking_screen.dart';
+import 'category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final ProviderServiceController providerServiceController = Get.put(ProviderServiceController());
   final UserService userService = Get.put(UserService());
+  final CategoryController categoryController = Get.put(CategoryController());
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildSearchBar(),
+            buildSearchBarWidget(providerServiceController),
             SizedBox(height: 24.0.h),
             buildSectionHeader("Best Category", () {}),
             SizedBox(height: 16.0.h),
@@ -43,7 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
               scrollDirection: Axis.horizontal, // Horizontal scroll enable
               child: Row(
                 children: [
-                  buildCategoryList(Icons.cut_outlined, 'Hair Salon'),
+                  GestureDetector(
+                    onTap: (){
+                      Get.to(() => CategoryScreen(category: 'HairCut'));
+                    },
+                      child: buildCategoryList(Icons.cut_outlined, 'HairCut')
+                  ),
                   SizedBox(width: 12.w),
                   buildCategoryList(Icons.brush_outlined, 'Makeup'),
                   SizedBox(width: 12.w),
@@ -69,26 +76,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: providerServiceController.service.length,
                   itemBuilder: (context, index) {
                     final service = providerServiceController.service[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=> BookingScreen(servicedetails: service,)));
-                      },
-                      child: SizedBox(
-                        width: 250.w,
-                        child: buildOfferCard(
-                          service['img'].toString(),
-                          service['rating'].toString(),
-                          service['ser_name'].toString(),
-                          service['subtitle'].toString(),
-                          service['price'].toString(),
-                          service['com_price'].toString(),
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: index == providerServiceController.service.length - 1 ? 0 : 10.w,
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => BookingScreen(servicedetails: service),
+                            ),
+                          );
+                        },
+                        child: SizedBox(
+                          width: 250.w,
+                          child: buildOfferCard(
+                            service['img'].toString(),
+                            service['rating'].toString(),
+                            service['ser_name'].toString(),
+                            service['subtitle'].toString(),
+                            service['price'].toString(),
+                            service['com_price'].toString(),
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
               );
-            }),
+            })
           ],
         ),
       ),

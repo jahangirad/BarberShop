@@ -2,14 +2,12 @@ import 'package:barber_shop/widgets/appbar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 import '../controllers/auth_fetch_controller.dart';
 import '../controllers/bookingdt_fetch_controller.dart';
 import '../controllers/order_controller.dart';
 import '../controllers/payment_controller.dart';
 import '../controllers/provider_service_controller.dart';
-import '../utils/route.dart';
 import 'booking_calender_screen.dart';
 import 'order_complete_screen.dart';
 
@@ -37,39 +35,42 @@ class _BookingScreenState extends State<BookingScreen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          welcomeMessage: 'Welcome',
-          username: 'Booking',
-          avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg'
+        welcomeMessage: 'Welcome',
+        username: userService.userData['name'].toString(),
+        avatarUrl: userService.userData['avatar'].toString(),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // Top Image - Replace with your actual image
-            SizedBox(
-              height: 250.h,
-              width: double.infinity,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0), // Radius সেট করুন
-                child: Image.network(
-                  widget.servicedetails['img'].toString(),
-                  fit: BoxFit.cover,
-                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                    return Container(
-                      color: Colors.grey[700],
-                      child: Icon(Icons.broken_image, size: 50.sp, color: Colors.white54),
-                    );
-                  },
+            Padding(
+              padding: EdgeInsets.all(20.r),
+              child: SizedBox(
+                height: 250.h,
+                width: double.infinity,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0), // Radius সেট করুন
+                  child: Image.network(
+                    widget.servicedetails['img'].toString(),
+                    fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                      return Container(
+                        color: Colors.grey[700],
+                        child: Icon(Icons.broken_image, size: 50.sp, color: Colors.white54),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

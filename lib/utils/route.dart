@@ -12,7 +12,6 @@ import '../views/splash_screen.dart';
 
 class AppRoutes {
   static const home = '/home';
-  static const category = '/category';
   static const login = '/login';
   static const signup = '/signup';
   static const forgotPassword = '/forgot_password';
@@ -23,7 +22,6 @@ class AppRoutes {
 
   static final routes = {
     home: (context) => HomeScreen(),
-    category: (context) => CategoryScreen(),
     login: (context) => LoginScreen(),
     signup: (context) => SignupScreen(),
     forgotPassword: (context) => ForgotPasswordScreen(),

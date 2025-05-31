@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ProviderServiceController extends GetxController {
   final RxList<dynamic> provider = <dynamic>[].obs;
   final RxList<dynamic> service = <dynamic>[].obs;
+  final RxList<dynamic> searchResults = <dynamic>[].obs;
   final RxBool isLoading = false.obs;
   Rx<File?> selectedImage = Rx<File?>(null);
 
@@ -25,35 +25,49 @@ class ProviderServiceController extends GetxController {
     }
   }
 
+  Future<void> fetchService() async {
+    try {
+      isLoading.value = true;
+      final response = await supabase.from('service').select();
+      service.assignAll(response);
+    } catch (e) {
+      throw Exception(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void searchService(String query) {
+    if (query.isEmpty) {
+      searchResults.clear();
+      return;
+    }
+
+    searchResults.value = service.where((s) {
+      final name = s['ser_name'].toString().toLowerCase();
+      return name.contains(query.toLowerCase());
+    }).toList();
+  }
+
   Future<void> addProvider(
       TextEditingController name,
       TextEditingController phone,
       ) async {
     try {
       isLoading.value = true;
-
-      final response = await supabase.from('serviceprovider').insert({
+      await supabase.from('serviceprovider').insert({
         'name': name.text,
         'phone': phone.text,
       });
-
-      // ✅ সফলভাবে ইনসার্ট হলে টোস্ট দেখাও
-      Get.snackbar(
-        'Success',
-        'Provider added successfully!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      Get.snackbar('Success', 'Provider added successfully!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white);
     } catch (e) {
-      // ❌ এরর হলে টোস্ট দেখাও
-      Get.snackbar(
-        'Error',
-        'Failed to add provider',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      Get.snackbar('Error', 'Failed to add provider',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
       throw Exception(e);
     } finally {
       isLoading.value = false;
@@ -63,16 +77,18 @@ class ProviderServiceController extends GetxController {
   Future<String?> uploadImage(File file) async {
     try {
       final fileExt = file.path.split('.').last;
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExt'; // অথবা Random নাম
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
       final filePath = 'userimages/$fileName';
 
       final bytes = await file.readAsBytes();
 
       await supabase.storage
           .from('userimages')
-          .uploadBinary(filePath, bytes, fileOptions: const FileOptions(upsert: true));
+          .uploadBinary(filePath, bytes,
+          fileOptions: const FileOptions(upsert: true));
 
-      final publicURL = supabase.storage.from('userimages').getPublicUrl(filePath);
+      final publicURL =
+      supabase.storage.from('userimages').getPublicUrl(filePath);
       return publicURL;
     } catch (e) {
       Get.snackbar('Error', 'Image upload failed: $e');
@@ -106,9 +122,11 @@ class ProviderServiceController extends GetxController {
         'img': imageUrl,
       });
 
-      Get.snackbar('Success', 'Service added successfully', backgroundColor: Colors.green, colorText: Colors.white);
+      Get.snackbar('Success', 'Service added successfully',
+          backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add service', backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', 'Failed to add service',
+          backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isLoading.value = false;
     }
@@ -119,18 +137,6 @@ class ProviderServiceController extends GetxController {
     final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
       selectedImage.value = File(picked.path);
-    }
-  }
-
-  Future<void> fetchService() async {
-    try {
-      isLoading.value = true;
-      final response = await supabase.from('service').select();
-      service.assignAll(response);
-    } catch (e) {
-      throw Exception(e);
-    } finally {
-      isLoading.value = false;
     }
   }
 

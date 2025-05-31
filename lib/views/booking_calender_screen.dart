@@ -118,8 +118,8 @@ class _BookingCalendarDemoAppState extends State<BookingCalendarDemoApp> {
         home: Scaffold(
           appBar: CustomAppBar(
             welcomeMessage: 'Welcome',
-            username: 'Hay, Kelly',
-            avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+            username: userService.userData['name'].toString(),
+            avatarUrl: userService.userData['avatar'].toString(),
           ),
           body: Center(
             child: BookingCalendar(

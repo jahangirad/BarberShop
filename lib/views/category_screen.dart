@@ -1,37 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:get/get.dart';
+import '../controllers/auth_fetch_controller.dart';
+import '../controllers/category_controller.dart';
 import '../widgets/appbar_widget.dart';
 import '../widgets/offercard_widget.dart';
 import '../widgets/searchbar_widget.dart';
 
 class CategoryScreen extends StatelessWidget {
-  const CategoryScreen({super.key});
+  final String category;
+
+  CategoryScreen({super.key, required this.category});
+
+  final CategoryController categoryController = Get.put(CategoryController());
+  final UserService userService = Get.put(UserService());
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Fetch when screen opens
+    categoryController.fetchServicesByCategory(category);
+
     return Scaffold(
       appBar: CustomAppBar(
         welcomeMessage: 'Welcome',
-        username: 'Hay, Kelly',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+        username: userService.userData['name'].toString(),
+        avatarUrl: userService.userData['avatar'].toString(),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            buildSearchBar(),
-            SizedBox(height: 24.0.h),
-            buildOfferCard(
-                'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGJhcmJlcnNob3B8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60',
-                '5',
-                'Razor Work Fred',
-                'QualityTrusted Services.',
-                '100',
-                '120'
-            ),
-          ],
-        ),
-      ),
+      body: Obx(() {
+        if (categoryController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (categoryController.serviceList.isEmpty) {
+          return Center(child: Text("No services found in $category"));
+        }
+
+        return ListView.builder(
+          padding: EdgeInsets.all(16.0.w),
+          itemCount: categoryController.serviceList.length,
+          itemBuilder: (context, index) {
+            final service = categoryController.serviceList[index];
+            return buildOfferCard(
+              service['img'],
+              service['rating'].toString(),
+              service['ser_name'],
+              service['subtitle'],
+              service['price'].toString(),
+              service['com_price'].toString(),
+            );
+          },
+        );
+      }),
     );
   }
 }
+

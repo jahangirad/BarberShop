@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:booking_calendar/booking_calendar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'controllers/auth_controller.dart';
 import 'controllers/auth_fetch_controller.dart';
 import 'controllers/provider_service_controller.dart';
