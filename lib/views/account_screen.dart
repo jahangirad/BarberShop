@@ -141,25 +141,33 @@ class _AccountScreenState extends State<AccountScreen> {
               context: context,
               icon: Icons.person_outline,
               title: 'Account Details',
-              onTap: () { print('Account Details tapped'); },
+              onTap: () {
+                Get.offAllNamed(AppRoutes.accountdetails);
+              },
             ),
             _buildSettingsItem(
               context: context,
-              icon: Icons.notifications_none_outlined,
-              title: 'Notification',
-              onTap: () { print('Notification tapped'); },
+              icon: Icons.call_outlined,
+              title: 'Support',
+              onTap: () {
+                Get.offAllNamed(AppRoutes.support);
+              },
             ),
             _buildSettingsItem(
               context: context,
               icon: Icons.privacy_tip_outlined,
               title: 'Privacy',
-              onTap: () { print('Privacy tapped'); },
+              onTap: () {
+                Get.offAllNamed(AppRoutes.privacy);
+              },
             ),
             _buildSettingsItem(
               context: context,
               icon: Icons.info_outline,
               title: 'About',
-              onTap: () { print('About tapped'); },
+              onTap: () {
+                Get.offAllNamed(AppRoutes.about);
+              },
             ),
 
 

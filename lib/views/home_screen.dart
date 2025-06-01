@@ -52,13 +52,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: buildCategoryList(Icons.cut_outlined, 'HairCut')
                   ),
                   SizedBox(width: 12.w),
-                  buildCategoryList(Icons.brush_outlined, 'Makeup'),
+                  GestureDetector(
+                      onTap: (){
+                        Get.to(() => CategoryScreen(category: 'Makeup'));
+                      },
+                      child: buildCategoryList(Icons.brush_outlined, 'Makeup')
+                  ),
                   SizedBox(width: 12.w),
-                  buildCategoryList(Icons.content_cut_outlined, 'Barber'),
+                  GestureDetector(
+                      onTap: (){
+                        Get.to(() => CategoryScreen(category: 'Barber'));
+                      },
+                      child: buildCategoryList(Icons.content_cut_outlined, 'Barber')
+                  ),
                   SizedBox(width: 12.w),
-                  buildCategoryList(Icons.handyman_outlined, 'Nail Salon'),
+                  GestureDetector(
+                      onTap: (){
+                        Get.to(() => CategoryScreen(category: 'Nail Salon'));
+                      },
+                      child: buildCategoryList(Icons.handyman_outlined, 'Nail Salon')
+                  ),
                   SizedBox(width: 12.w),
-                  buildCategoryList(Icons.spa_outlined, 'Massage'),
+                  GestureDetector(
+                      onTap: (){
+                        Get.to(() => CategoryScreen(category: 'Massage'));
+                      },
+                      child: buildCategoryList(Icons.spa_outlined, 'Massage')
+                  ),
                 ],
               ),
             ),

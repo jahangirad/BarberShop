@@ -50,9 +50,7 @@ class ProviderServiceController extends GetxController {
   }
 
   Future<void> addProvider(
-      TextEditingController name,
-      TextEditingController phone,
-      ) async {
+      TextEditingController name, TextEditingController phone) async {
     try {
       isLoading.value = true;
       await supabase.from('serviceprovider').insert({
@@ -82,10 +80,11 @@ class ProviderServiceController extends GetxController {
 
       final bytes = await file.readAsBytes();
 
-      await supabase.storage
-          .from('userimages')
-          .uploadBinary(filePath, bytes,
-          fileOptions: const FileOptions(upsert: true));
+      await supabase.storage.from('userimages').uploadBinary(
+        filePath,
+        bytes,
+        fileOptions: const FileOptions(upsert: true),
+      );
 
       final publicURL =
       supabase.storage.from('userimages').getPublicUrl(filePath);
@@ -104,6 +103,7 @@ class ProviderServiceController extends GetxController {
     required String comparePrice,
     required String duration,
     required String providerUid,
+    required String providerName,
     required File image,
   }) async {
     try {
@@ -118,7 +118,8 @@ class ProviderServiceController extends GetxController {
         'price': price,
         'com_price': comparePrice,
         'duration': duration,
-        'providername': providerUid,
+        'providername': providerName,
+        'uid': providerUid,
         'img': imageUrl,
       });
 
@@ -147,3 +148,4 @@ class ProviderServiceController extends GetxController {
     super.onInit();
   }
 }
+

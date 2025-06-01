@@ -68,4 +68,39 @@ class OrderController extends GetxController{
       isLoading.value = false;
     }
   }
+
+  Future<void> deleteOrder(int id) async {
+    try {
+      isLoading.value = true;
+
+      await supabase.from('orders').delete().match({'id': id});
+
+      orderList.removeWhere((order) => order['id'] == id);
+
+      Get.snackbar(
+        'Success',
+        'Order deleted successfully!',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to delete order',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      throw Exception(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  @override
+  void onInit() {
+    fetchOrders(); // ✅ fetch from Supabase
+    super.onInit();
+  }
 }

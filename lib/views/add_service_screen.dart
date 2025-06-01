@@ -8,7 +8,6 @@ class AddServiceTab extends StatelessWidget {
   final controller = Get.put(ProviderServiceController());
 
   final _formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
   final subtitleController = TextEditingController();
   final descriptionController = TextEditingController();
   final ratingController = TextEditingController();
@@ -17,8 +16,11 @@ class AddServiceTab extends StatelessWidget {
   final durationController = TextEditingController();
 
   final selectedProviderUid = ''.obs;
+  final selectedProviderName = ''.obs;
 
-  final Color _primaryColor = const Color(0xFFFDB813); // Glamii Red
+  final selectedServiceName = ''.obs;
+
+  final Color _primaryColor = const Color(0xFFFDB813);
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +86,42 @@ class AddServiceTab extends StatelessWidget {
               ),
 
               SizedBox(height: 20.h),
-              _buildTextField(nameController, "Service Name"),
+
+              // Service Name Dropdown
+              Obx(() {
+                final items = [
+                  'HairCut',
+                  'Makeup',
+                  'Barber',
+                  'Nail Salon',
+                  'Massage',
+                ]
+                    .map((service) => DropdownMenuItem<String>(
+                  value: service,
+                  child: Text(service),
+                ))
+                    .toList();
+
+                final currentValue = items
+                    .any((item) => item.value == selectedServiceName.value)
+                    ? selectedServiceName.value
+                    : null;
+
+                return DropdownButtonFormField<String>(
+                  value: currentValue,
+                  hint: const Text("Select Service"),
+                  items: items,
+                  onChanged: (val) => selectedServiceName.value = val!,
+                  validator: (val) =>
+                  val == null ? 'Please select a service' : null,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Service Name",
+                  ),
+                );
+              }),
+              const SizedBox(height: 16),
+
               _buildTextField(subtitleController, "Subtitle"),
               _buildTextField(ratingController, "Rating", isNumber: true),
               _buildTextField(priceController, "Price", isNumber: true),
@@ -96,23 +133,34 @@ class AddServiceTab extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Provider Dropdown
-              Obx(() => DropdownButtonFormField<String>(
-                value: selectedProviderUid.value.isEmpty
-                    ? null
-                    : selectedProviderUid.value,
+            Obx(() {
+              final items = controller.provider.map<DropdownMenuItem<String>>((prov) {
+                final uid = prov['uid']; // Ensure 'uid' field exists
+                final name = prov['name'];
+                return DropdownMenuItem<String>(
+                  value: uid,
+                  child: Text(name),
+                  onTap: () {
+                    selectedProviderName.value = name;
+                  },
+                );
+              }).toList();
+
+              final currentValue = items
+                  .any((item) => item.value == selectedProviderUid.value)
+                  ? selectedProviderUid.value
+                  : null;
+
+              return DropdownButtonFormField<String>(
+                value: currentValue,
                 hint: const Text("Select Provider"),
-                items: controller.provider
-                    .map((prov) => DropdownMenuItem<String>(
-                  value: prov['providername'],
-                  child: Text(prov['name']),
-                ))
-                    .toList(),
+                items: items,
                 onChanged: (val) => selectedProviderUid.value = val!,
                 validator: (val) =>
-                val == null ? 'Please select provider' : null,
-                decoration:
-                const InputDecoration(border: OutlineInputBorder()),
-              )),
+                val == null || val.isEmpty ? 'Please select provider' : null,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+              );
+            }),
 
               SizedBox(height: 24.h),
 
@@ -124,13 +172,14 @@ class AddServiceTab extends StatelessWidget {
                   if (_formKey.currentState!.validate() &&
                       controller.selectedImage.value != null) {
                     controller.addService(
-                      name: nameController.text,
+                      name: selectedServiceName.value,
                       subtitle: subtitleController.text,
                       rating: ratingController.text,
                       price: priceController.text,
                       comparePrice: comparePriceController.text,
                       duration: durationController.text,
                       providerUid: selectedProviderUid.value,
+                      providerName: selectedProviderName.value,
                       image: controller.selectedImage.value!,
                     );
                   } else {
@@ -190,3 +239,6 @@ class AddServiceTab extends StatelessWidget {
     );
   }
 }
+
+
+
